@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {
     XAxis, YAxis, CartesianGrid, Bar, BarChart, Tooltip,
-    ResponsiveContainer, Legend, Cell
+    Area, Legend, Cell
 } from 'recharts';
 
 export default class Chart extends Component {
@@ -13,9 +13,11 @@ export default class Chart extends Component {
             uv: false,
             amt: false,
             chartClicked: false,
+            monthChartClicked: false,
         }
         this.handleCheckBoxClick = this.handleCheckBoxClick.bind(this);
         this.handleChartClick = this.handleChartClick.bind(this);
+        this.handleMonthClick = this.handleMonthClick.bind(this);
     }
 
     handleCheckBoxClick(event) {
@@ -30,13 +32,19 @@ export default class Chart extends Component {
         })
     }
 
+    handleMonthClick() {
+        this.setState({
+            monthChartClicked: !this.state.monthChartClicked,
+        })
+    }
+
     YearChart = (props) => {
         return (
             <BarChart width={700} height={300} data={props.dataYears}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <XAxis dataKey="Year" />
-                <YAxis />
-                <Tooltip />
+                <XAxis dataKey="Year" stroke="white" />
+                <YAxis stroke="white" />
+                <Tooltip cursor={false} />
                 <Bar dataKey="total" fill="#CE6629" onClick={this.handleChartClick}>
                     {
                         props.dataYears.map((entry, index) => (
@@ -55,22 +63,22 @@ export default class Chart extends Component {
                 <button onClick={this.handleChartClick}>Go back</button>
                 <div>
                     <input type="checkbox" id="pv" name="checkbox" value="pv" defaultChecked={this.state.pv} onClick={this.handleCheckBoxClick} />
-                    <label forhtml="pv">Pv</label>
+                    <label>Pv</label>
                 </div>
                 <div>
                     <input type="checkbox" id="uv" name="chekbox" value="uv" defaultChecked={this.state.uv} onClick={this.handleCheckBoxClick} />
-                    <label forhtml="uv">Uv</label>
+                    <label>Uv</label>
                 </div>
                 <div>
                     <input type="checkbox" id="amt" name="chekbox" value="amt" defaultChecked={this.state.amt} onClick={this.handleCheckBoxClick} />
-                    <label forhtml="amt">Amt</label>
+                    <label>Amt</label>
                 </div>
                 <BarChart width={900} height={300} data={props.dataMonths}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    {pv ? <Bar dataKey="pv" fill="#CE6629">
+                    <XAxis dataKey="name" stroke="white"/>
+                    <YAxis stroke="white"/>
+                    <Tooltip cursor={false}/>
+                    {pv ? <Bar dataKey="pv" fill="#CE6629" onClick={this.handleMonthClick}>
                         {
                             props.dataMonths.map((entry, index) => (
                                 <Cell fill='#8884d8' key={`cell-${index}`} />
@@ -82,6 +90,24 @@ export default class Chart extends Component {
                     {amt ? <Bar dataKey="amt" fill="#CEB42B" /> : ''}
                 </BarChart>
             </div>)
+    }
+
+    DayChart = (props) => {
+        return (
+            <BarChart width={700} height={300} data={props.dataDays}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <XAxis dataKey="Day" stroke="white"/>
+                <YAxis stroke="white"/>
+                <Tooltip cursor={false}/>
+                <Bar dataKey="value" fill="#CE6629" onClick={this.handleMonthClick}>
+                    {
+                        props.dataDays.map((entry, index) => (
+                            <Cell fill='#8884d8' key={`cell-${index}`} />
+                        ))
+                    }
+                </Bar>
+            </BarChart>
+        )
     }
 
     render() {
@@ -108,11 +134,46 @@ export default class Chart extends Component {
 
         ];
 
-        const { chartClicked } = this.state;
+        const dataDays = [
+            { Day: '1', value: 20},
+            { Day: '2', value: 40 },
+            { Day: '3', value: 23 },
+            { Day: '4', value: 16 },
+            { Day: '5', value: 29 },
+            { Day: '6', value: 14 },
+            { Day: '7', value: 17 },
+            { Day: '8', value: 11 },
+            { Day: '9', value: 13 },
+            { Day: '10', value: 9 },
+            { Day: '11', value: 7},
+            { Day: '12', value: 18 },
+            { Day: '13', value: 36 },
+            { Day: '14', value: 33 },
+            { Day: '15', value: 2 },
+            { Day: '16', value: 17 },
+            { Day: '17', value: 39 },
+            { Day: '18', value: 40 },
+            { Day: '19', value: 42 },
+            { Day: '20', value: 16 },
+            { Day: '21', value: 33 },
+            { Day: '22', value: 23 },
+            { Day: '23', value: 10 },
+            { Day: '24', value: 20 },
+            { Day: '25', value: 17 },
+            { Day: '26', value: 27 },
+            { Day: '27', value: 29 },
+            { Day: '28', value: 36 },
+            { Day: '29', value: 37 },
+            { Day: '30', value: 28 },
+            { Day: '31', value: 43 },
+
+        ]
+
+        const { chartClicked, monthChartClicked } = this.state;
 
         return (
-            <div>            
-                {!chartClicked ? <this.YearChart dataYears={dataYears}/> : <this.MonthChart dataMonths={dataMonths}/>}
+            <div id="container" style={{'backgroundColor':'#171336', 'fontColor': 'white'}}>            
+                {!chartClicked ? <this.YearChart dataYears={dataYears} /> : !monthChartClicked ? <this.MonthChart dataMonths={dataMonths} /> : <this.DayChart dataDays={dataDays}/> }
             </div>
 
         )
